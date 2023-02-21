@@ -33,6 +33,7 @@ from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_util
     python_type,
     camel_to_snake,
     ignore_description,
+    InputValidator
 )
 from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.generator import generate_documentation
 
@@ -1329,11 +1330,18 @@ class ActionModule(ActionBase):
         :return: The results from the parser
         :rtype: dict
         """
-        
+
         self._result = super(ActionModule, self).run(tmp, task_vars)
         self._task_vars = task_vars
         
         args = self._task.args
+        InputValidator(
+            name=args.get("collection"),
+            api_object_path=args.get("schema_dir"),
+            resource=args.get("modules"),
+            path=args.get("target_dir"),
+        )
+
         func = "generate_" + args['collection'] + "(args, task_vars['vars']['role_path'])"
         eval(func)
 

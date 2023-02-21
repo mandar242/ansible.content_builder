@@ -2,7 +2,7 @@
 
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 import jinja2
 import baron
 import redbaron
@@ -12,6 +12,7 @@ import copy
 import subprocess
 from pathlib import Path
 from functools import lru_cache
+from pydantic import BaseModel, validator
 
 
 def jinja2_renderer(
@@ -269,3 +270,34 @@ class UtilsBase:
         module_dir.mkdir(parents=True, exist_ok=True)
         module_py_file = module_dir / "{name}.py".format(name=self.name)
         module_py_file.write_text(content)
+
+
+class InputValidator(BaseModel):
+    name: Optional[str] # collection
+    api_object_path: Optional[str] # schema_dir
+    resource: Optional[str] # modules
+    path: Optional[str] # target_dir
+
+    @validator('name')
+    def required_name(cls, v):
+        import q; q('name ', v, type(v))
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError('name must not be empty string.')
+
+    @validator('api_object_path')
+    def required_api_object_path(cls, v):
+        import q; q('api_object_path ', v, type(v))
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError('api_object_path must not be empty string.')
+
+    @validator('resource')
+    def required_resource(cls, v):
+        import q; q('resource ', v, type(v))
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError('resource must not be empty string.')
+
+    @validator('path')
+    def required_path(cls, v):
+        import q; q('path ', v, type(v), isinstance(v, str))
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError('path must not be empty string.')

@@ -1,7 +1,7 @@
 import pathlib
 
 from ansible.plugins.action import ActionBase
-from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.utils import InputValidator
+from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.utils import PluginsInputValidator, CollectionInputValidator
 
 
 def refresh_ignore_files(target_dir):
@@ -215,7 +215,13 @@ class ActionModule(ActionBase):
         self._task_vars = task_vars
 
         args = self._task.args
-        InputValidator(path=args.get("target_dir"))
+
+        input_vars_collection =task_vars["collection"]
+        input_vars_plugins = task_vars["plugins"][0]
+
+        PluginsInputValidator(**input_vars_plugins)
+        CollectionInputValidator(**input_vars_collection)
+
         refresh_ignore_files(target_dir=args.get("target_dir"))
 
         return self._result

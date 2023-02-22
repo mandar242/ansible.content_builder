@@ -272,32 +272,76 @@ class UtilsBase:
         module_py_file.write_text(content)
 
 
-class InputValidator(BaseModel):
-    name: Optional[str] # collection
-    api_object_path: Optional[str] # schema_dir
-    resource: Optional[str] # modules
-    path: Optional[str] # target_dir
+class PluginsInputValidator(BaseModel):
+    type: str
+    name: str
+    content: str
+    module_version: str
+    api_object_path: str
+    resource: str
+    action: str
+    unique_key: Optional[str]
+    rm_swagger_json: Optional[str]
+    version: str
+    author: Optional[str]
 
-    @validator('name')
+    @validator("type")
+    def required_type(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("type must not be empty string.")
+
+    @validator("name")
     def required_name(cls, v):
-        import q; q('name ', v, type(v))
         if not isinstance(v, str) or len(v) == 0:
-            raise ValueError('name must not be empty string.')
+            raise ValueError("name must not be empty string.")
 
-    @validator('api_object_path')
+    @validator("content")
+    def required_content(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("content must not be empty string.")
+
+    @validator("module_version")
+    def required_module_version(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("module_version must not be empty string.")
+
+    @validator("api_object_path")
     def required_api_object_path(cls, v):
-        import q; q('api_object_path ', v, type(v))
         if not isinstance(v, str) or len(v) == 0:
-            raise ValueError('api_object_path must not be empty string.')
+            raise ValueError("api_object_path must not be empty string.")
 
-    @validator('resource')
+    @validator("resource")
     def required_resource(cls, v):
-        import q; q('resource ', v, type(v))
         if not isinstance(v, str) or len(v) == 0:
-            raise ValueError('resource must not be empty string.')
+            raise ValueError("resource must not be empty string.")
 
-    @validator('path')
-    def required_path(cls, v):
-        import q; q('path ', v, type(v), isinstance(v, str))
+    @validator("action")
+    def required_action(cls, v):
         if not isinstance(v, str) or len(v) == 0:
-            raise ValueError('path must not be empty string.')
+            raise ValueError("action must not be empty string.")
+
+    @validator("version")
+    def required_version(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("version must not be empty string.")
+
+
+class CollectionInputValidator(BaseModel):
+    path: str
+    name: str
+    namespace: str
+
+    @validator("path")
+    def required_path(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("path must not be empty string.")
+
+    @validator("name")
+    def required_name(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("name must not be empty string.")
+
+    @validator("namespace")
+    def required_namespace(cls, v):
+        if not isinstance(v, str) or len(v) == 0:
+            raise ValueError("namespace must not be empty string.")

@@ -7,7 +7,8 @@ import yaml
 from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils import generator
 from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.utils import (
     camel_to_snake,
-    InputValidator
+    PluginsInputValidator,
+    CollectionInputValidator
 )
 from ansible.plugins.action import ActionBase
 
@@ -76,10 +77,12 @@ class ActionModule(ActionBase):
         self._task_vars = task_vars
 
         args = self._task.args
-        InputValidator(
-            api_object_path=args.get("api_object_path"),
-            resource=args.get("resource"),
-        )
+
+        input_vars_collection =task_vars["collection"]
+        input_vars_plugins = task_vars["plugins"][0]
+
+        PluginsInputValidator(**input_vars_plugins)
+        CollectionInputValidator(**input_vars_collection)
 
         RESOURCES = []
         resource_file = pathlib.Path(args.get("resource") + "/modules.yaml")

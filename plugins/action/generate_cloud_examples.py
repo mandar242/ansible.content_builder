@@ -10,7 +10,7 @@ import ruamel.yaml
 import yaml
 from ansible.plugins.action import ActionBase
 
-from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.utils import InputValidator
+from ansible_collections.ansible.content_builder.plugins.plugin_utils.cloud_utils.utils import PluginsInputValidator, CollectionInputValidator
 
 class MissingDependency(Exception):
     pass
@@ -260,9 +260,13 @@ class ActionModule(ActionBase):
         self._result = super(ActionModule, self).run(tmp, task_vars)
         self._task_vars = task_vars
         args = self._task.args
-        InputValidator(path=args.get("target_dir"))
-        # import q; q(task_vars["plugins"][0].keys())
-    
+
+        input_vars_collection =task_vars["collection"]
+        input_vars_plugins = task_vars["plugins"][0]
+
+        PluginsInputValidator(**input_vars_plugins)
+        CollectionInputValidator(**input_vars_collection)
+
         galaxy_file = args.get("target_dir") + "/galaxy.yml"
         galaxy = yaml.safe_load(Path(galaxy_file).open())
         vars_file = task_vars['vars']['role_path'] + "/vars/main.yaml"
